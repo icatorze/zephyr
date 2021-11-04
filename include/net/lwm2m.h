@@ -99,6 +99,12 @@ struct lwm2m_ctx {
 	 */
 	int tls_tag;
 
+	/** When MBEDTLS SNI is enabled socket must be set with destination
+	 *  hostname server.
+	 */
+	char *desthostname;
+	uint16_t desthostnamelen;
+
 	/** Client can set load_credentials function as a way of overriding
 	 *  the default behavior of load_tls_credential() in lwm2m_engine.c
 	 */
@@ -886,6 +892,18 @@ int lwm2m_engine_delete_res_inst(char *pathstr);
  * @return 0 for success or negative in case of error.
  */
 int lwm2m_engine_update_service_period(k_work_handler_t service, uint32_t period_ms);
+
+/**
+ * @brief Update the period of the device service.
+ *
+ * Change the duration of the periodic device service that notifies the
+ * current time.
+ *
+ * @param[in] period_ms New period for the device service (in milliseconds)
+ *
+ * @return 0 for success or negative in case of error.
+ */
+int lwm2m_update_device_service_period(uint32_t period_ms);
 
 /**
  * @brief Start the LwM2M engine

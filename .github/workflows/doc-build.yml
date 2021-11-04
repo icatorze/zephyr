@@ -30,7 +30,7 @@ env:
   # The latest CMake available directly with apt is 3.18, but we need >=3.20
   # so we fetch that through pip.
   CMAKE_VERSION: 3.20.5
-  DOXYGEN_VERSION: 1.9.1
+  DOXYGEN_VERSION: 1.9.2
 
 jobs:
   doc-build-html:
@@ -73,7 +73,7 @@ jobs:
           DOC_TAG="development"
         fi
 
-        DOC_TAG=${DOC_TAG} SPHINXOPTS="-q -W -j auto" make -C doc html
+        DOC_TAG=${DOC_TAG} SPHINXOPTS="-q -W -j auto -t publish" make -C doc html
 
     - name: compress-docs
       run: |

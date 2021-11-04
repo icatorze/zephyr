@@ -35,10 +35,22 @@
 &uart0 {
 	status = "okay";
 	current-speed = <115200>;
+	tx-pin = <2>;
+	rx-pin = <3>;
 };
 
 &trng0 {
 	status = "okay";
+};
+
+&spi2 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+	miso-pin = <2>;
+	mosi-pin = <7>;
+	sclk-pin = <6>;
+	csel-pin = <10>;
 };
 
 &gpio0 {
