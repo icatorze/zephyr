@@ -4652,6 +4652,7 @@ int lwm2m_socket_start(struct lwm2m_ctx *client_ctx)
 	int flags;
 #if defined(CONFIG_LWM2M_DTLS_SUPPORT)
 	int ret;
+	uint8_t tmp;
 
 	if (client_ctx->load_credentials) {
 		ret = client_ctx->load_credentials(client_ctx);
@@ -4700,20 +4701,21 @@ int lwm2m_socket_start(struct lwm2m_ctx *client_ctx)
 			return -errno;
 		}
 
-		if (client_ctx->desthostname != NULL ) {
+		if (client_ctx->desthostname != NULL) {
 			/** store character at len position */
-			uint8_t tmp;
 			tmp = client_ctx->desthostname[client_ctx->desthostnamelen];
+
 			/** change it to '\0' to pass to socket*/
 			client_ctx->desthostname[client_ctx->desthostnamelen] = '\0';
-			/** mbedtls ignores lenght */
-			ret = setsockopt(client_ctx->sock_fd, SOL_TLS, TLS_HOSTNAME, client_ctx->desthostname,
-					client_ctx->desthostnamelen);
+
+			/** mbedtls ignores length */
+			ret = setsockopt(client_ctx->sock_fd, SOL_TLS, TLS_HOSTNAME,
+					client_ctx->desthostname, client_ctx->desthostnamelen);
+
 			/** restore character */
 			client_ctx->desthostname[client_ctx->desthostnamelen] = tmp;
 			if (ret < 0) {
-				LOG_ERR("Failed to set TLS_HOSTNAME option: %d",
-								errno);
+				LOG_ERR("Failed to set TLS_HOSTNAME option: %d", errno);
 				return -errno;
 			}
 		}
@@ -4790,7 +4792,8 @@ int lwm2m_parse_peerinfo(char *url, struct lwm2m_ctx *client_ctx, bool is_firmwa
 	len = parser.field_data[UF_HOST].len;
 
 #if defined(CONFIG_LWM2M_DTLS_SUPPORT)
-    /** copy url pointer to be used in socket */
+
+	/** copy url pointer to be used in socket */
 	client_ctx->desthostname = url + off;
 	client_ctx->desthostnamelen = len;
 #endif
@@ -4875,7 +4878,6 @@ int lwm2m_engine_start(struct lwm2m_ctx *client_ctx)
 	url[url_len] = '\0';
 
 	ret = lwm2m_parse_peerinfo(url, client_ctx, false);
-
 	if (ret < 0) {
 		return ret;
 	}
