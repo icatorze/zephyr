@@ -520,7 +520,10 @@ static void eth_mcux_phy_event(struct eth_context *context)
 			k_work_reschedule(&context->delayed_phy_work,
 					  K_MSEC(CONFIG_ETH_MCUX_PHY_TICK_MS));
 			context->phy_state = eth_mcux_phy_state_wait;
-			net_eth_carrier_off(context->iface);
+			if (context->iface) {
+				net_eth_carrier_off(context->iface);
+				k_msleep(USEC_PER_MSEC);
+			}
 		} else {
 			k_work_reschedule(&context->delayed_phy_work,
 					  K_MSEC(CONFIG_ETH_MCUX_PHY_TICK_MS));
@@ -604,6 +607,7 @@ static void eth_mcux_phy_setup(struct eth_context *context)
 		if (res != kStatus_Success) {
 			LOG_WRN("Writing PHY reg failed (status 0x%x)", res);
 		}
+
 	}
 
 	ENET_EnableInterrupts(context->base, ENET_EIR_MII_MASK);
@@ -1354,7 +1358,7 @@ static void eth_mcux_err_isr(const struct device *dev)
 	static struct eth_context eth##n##_context = {			\
 		.base = (ENET_Type *)DT_INST_REG_ADDR(n),		\
 		.config_func = eth##n##_config_func,			\
-		.phy_addr = 0U,						\
+		.phy_addr = 1U,						\
 		.phy_duplex = kPHY_FullDuplex,				\
 		.phy_speed = kPHY_Speed100M,				\
 		ETH_MCUX_MAC_ADDR(n)					\

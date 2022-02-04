@@ -641,6 +641,7 @@ vxt	VXT Ltd
 wand	Wandbord (Technexion)
 waveshare	Waveshare Electronics
 wd	Western Digital Corp.
+weg	WEG Drivers and Controls SA
 we	Würth Elektronik GmbH.
 weact	WeAct Studio
 wetek	WeTek Electronics, limited.
