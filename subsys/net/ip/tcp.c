@@ -203,7 +203,7 @@ static int tcp_endpoint_set(union tcp_endpoint *ep, struct net_pkt *pkt,
 	return ret;
 }
 
-static const char *tcp_flags(uint8_t flags)
+static const char* tcp_flags (uint8_t flags)
 {
 #define BUF_SIZE 25 /* 6 * 4 + 1 */
 	static char buf[BUF_SIZE];
@@ -247,7 +247,7 @@ static size_t tcp_data_len(struct net_pkt *pkt)
 	return len > 0 ? (size_t)len : 0;
 }
 
-static const char *tcp_th(struct net_pkt *pkt)
+static const char* tcp_th (struct net_pkt *pkt)
 {
 #define BUF_SIZE 80
 	static char buf[BUF_SIZE];
@@ -547,7 +547,8 @@ static void tcp_send_timer_cancel(struct tcp *conn)
 	}
 }
 
-static const char *tcp_state_to_str(enum tcp_state state, bool prefix)
+static const char* tcp_state_to_str (enum tcp_state state,
+                                     bool prefix)
 {
 	const char *s = NULL;
 #define _(_x) case _x: do { s = #_x; goto out; } while (0)
@@ -570,7 +571,8 @@ out:
 	return prefix ? s : (s + 4);
 }
 
-static const char *tcp_conn_state(struct tcp *conn, struct net_pkt *pkt)
+static const char* tcp_conn_state (struct tcp *conn,
+                                   struct net_pkt *pkt)
 {
 #define BUF_SIZE 160
 	static char buf[BUF_SIZE];
@@ -1142,6 +1144,12 @@ static void tcp_resend_data(struct k_work *work)
 		}
 	} else if (ret == -ENODATA) {
 		conn->data_mode = TCP_DATA_MODE_SEND;
+		goto out;
+	}
+
+	else if (ret == -ENOBUFS) {
+		NET_DBG("conn: %p close, out of buffers", conn);
+		conn_unref = true;
 		goto out;
 	}
 
