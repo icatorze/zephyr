@@ -62,7 +62,7 @@ LOG_MODULE_REGISTER(spi_ll_stm32);
 uint32_t dummy_rx_tx_buffer;
 
 /* This function is executed in the interrupt context */
-static void dma_callback(const struct device *dev, void *arg,
+__attribute__ ((unused)) static void dma_callback(const struct device *dev, void *arg,
 			 uint32_t channel, int status)
 {
 	/* arg directly holds the spi device */

@@ -82,7 +82,7 @@ static void dma_stm32_clear_stream_irq(const struct device *dev, uint32_t id)
 	stm32_dma_clear_stream_irq(dma, id);
 }
 
-static void dma_stm32_irq_handler(const struct device *dev, uint32_t id)
+__attribute__ ((unused)) static void dma_stm32_irq_handler(const struct device *dev, uint32_t id)
 {
 	const struct dma_stm32_config *config = dev->config;
 	DMA_TypeDef *dma = (DMA_TypeDef *)(config->base);
@@ -589,7 +589,7 @@ DMA_STM32_EXPORT_API int dma_stm32_stop(const struct device *dev, uint32_t id)
 	return 0;
 }
 
-static int dma_stm32_init(const struct device *dev)
+__attribute__ ((unused)) static int dma_stm32_init(const struct device *dev)
 {
 	const struct dma_stm32_config *config = dev->config;
 	const struct device *clk = DEVICE_DT_GET(STM32_CLOCK_CONTROL_NODE);
@@ -638,7 +638,7 @@ DMA_STM32_EXPORT_API int dma_stm32_get_status(const struct device *dev,
 	return 0;
 }
 
-static const struct dma_driver_api dma_funcs = {
+__attribute__ ((unused)) static const struct dma_driver_api dma_funcs = {
 	.reload		 = dma_stm32_reload,
 	.config		 = dma_stm32_configure,
 	.start		 = dma_stm32_start,
