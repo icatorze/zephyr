@@ -28,11 +28,13 @@
 #define HTS221_REG_CTRL3		0x22
 #define HTS221_DRDY_EN			BIT(2)
 
-#define HTS221_REG_DATA_START		0x28
+#define HTS221_REG_STATUS_REG		0x27
+#define HTS221_REG_DATA_START		0x27
 #define HTS221_REG_CONVERSION_START	0x30
 
 struct hts221_data {
 	const struct device *i2c;
+	uint8_t sts_reg;
 	int16_t rh_sample;
 	int16_t t_sample;
 

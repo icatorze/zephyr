@@ -18,7 +18,7 @@
 
 LOG_MODULE_REGISTER(HTS221, CONFIG_SENSOR_LOG_LEVEL);
 
-static const char * const hts221_odr_strings[] = {
+static const char *const hts221_odr_strings[] = {
 	"1", "7", "12.5"
 };
 
@@ -63,19 +63,38 @@ static int hts221_sample_fetch(const struct device *dev,
 {
 	struct hts221_data *data = dev->data;
 	const struct hts221_config *cfg = dev->config;
-	uint8_t buf[4];
+	uint8_t buf[5];
+	uint8_t try = 0;
 
 	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL);
 
+	do {
+		if (i2c_burst_read(data->i2c, cfg->i2c_addr,
+                           HTS221_REG_STATUS_REG,
+                           buf, 1) < 0) {
+        	        LOG_ERR("Failed to fetch data sample.");
+                	return -EIO;
+        	}
+		k_sleep(K_MSEC(110));
+		try++;
+		if (try>10) {
+			LOG_ERR("Conversion timeout");
+			return -EAGAIN;
+		}
+	}
+	while (buf[0] != 0x3);
+
 	if (i2c_burst_read(data->i2c, cfg->i2c_addr,
 			   HTS221_REG_DATA_START | HTS221_AUTOINCREMENT_ADDR,
-			   buf, 4) < 0) {
+			   buf, 5) < 0) {
 		LOG_ERR("Failed to fetch data sample.");
 		return -EIO;
 	}
 
-	data->rh_sample = sys_le16_to_cpu(buf[0] | (buf[1] << 8));
-	data->t_sample = sys_le16_to_cpu(buf[2] | (buf[3] << 8));
+	data->sts_reg = buf[0];
+
+	data->rh_sample = sys_le16_to_cpu(buf[1] | (buf[2] << 8));
+	data->t_sample = sys_le16_to_cpu(buf[3] | (buf[4] << 8));
 
 	return 0;
 }
