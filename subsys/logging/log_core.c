@@ -207,7 +207,7 @@ static void detect_missed_strdup(struct log_msg *msg)
 			if (IS_ENABLED(CONFIG_ASSERT)) {
 				__ASSERT(0, ERR_MSG, idx, src_name, msg_str);
 			} else {
-				LOG_ERR(ERR_MSG, idx, src_name, msg_str);
+				LOG_ERR(ERR_MSG, idx, log_strdup(src_name), log_strdup(msg_str));
 			}
 		}
 
@@ -431,7 +431,7 @@ void log_generic(struct log_msg_ids src_level, const char *fmt, va_list ap,
 		log_generic_from_user(src_level, fmt, ap);
 	} else if (IS_ENABLED(CONFIG_LOG_IMMEDIATE) &&
 	    (!IS_ENABLED(CONFIG_LOG_FRONTEND))) {
-		struct log_backend const *backend;
+		const struct log_backend *backend;
 		uint32_t timestamp = timestamp_func();
 
 		for (int i = 0; i < log_backend_count_get(); i++) {
@@ -502,7 +502,7 @@ void log_hexdump_sync(struct log_msg_ids src_level, const char *metadata,
 		log_frontend_hexdump(metadata, (const uint8_t *)data, len,
 				     src_level);
 	} else {
-		struct log_backend const *backend;
+		const struct log_backend *backend;
 		log_timestamp_t timestamp = timestamp_func();
 
 		for (int i = 0; i < log_backend_count_get(); i++) {
@@ -642,7 +642,7 @@ int log_set_timestamp_func(log_timestamp_get_t timestamp_getter, uint32_t freq)
 
 void z_impl_log_panic(void)
 {
-	struct log_backend const *backend;
+	const struct log_backend *backend;
 
 	if (panic_mode) {
 		return;
@@ -678,7 +678,7 @@ void z_vrfy_log_panic(void)
 #include <syscalls/log_panic_mrsh.c>
 #endif
 
-static bool msg_filter_check(struct log_backend const *backend,
+static bool msg_filter_check (const struct log_backend *backend,
 			     union log_msgs msg)
 {
 	if (IS_ENABLED(CONFIG_LOG2) && !z_log_item_is_msg(msg.msg2)) {
@@ -717,7 +717,7 @@ static bool msg_filter_check(struct log_backend const *backend,
 
 static void msg_process(union log_msgs msg, bool bypass)
 {
-	struct log_backend const *backend;
+	const struct log_backend *backend;
 
 	if (!bypass) {
 		if (!IS_ENABLED(CONFIG_LOG2) &&
@@ -754,7 +754,7 @@ void dropped_notify(void)
 	uint32_t dropped = z_log_dropped_read_and_clear();
 
 	for (int i = 0; i < log_backend_count_get(); i++) {
-		struct log_backend const *backend = log_backend_get(i);
+		const struct log_backend *backend = log_backend_get (i);
 
 		if (log_backend_is_active(backend)) {
 			log_backend_dropped(backend, dropped);
