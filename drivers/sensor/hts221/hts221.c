@@ -18,6 +18,8 @@
 
 LOG_MODULE_REGISTER(HTS221, CONFIG_SENSOR_LOG_LEVEL);
 
+int hts221_init(const struct device *dev)
+
 static const char *const hts221_odr_strings[] = {
 	"1", "7", "12.5"
 };
@@ -78,6 +80,7 @@ static int hts221_sample_fetch(const struct device *dev,
 		k_sleep(K_MSEC(110));
 		try++;
 		if (try>10) {
+			hts221_init(dev);
 			LOG_ERR("Conversion timeout");
 			return -EAGAIN;
 		}
