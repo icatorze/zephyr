@@ -79,6 +79,8 @@ static int mcux_lpi2c_configure(const struct device *dev,
 		return ret;
 	}
 
+	LPI2C_MasterCheckAndClearError(base,LPI2C_MasterGetStatusFlags(base));
+
 	LPI2C_MasterSetBaudRate(base, clock_freq, baudrate);
 	k_sem_give(&data->lock);
 
@@ -194,6 +196,9 @@ static int mcux_lpi2c_transfer(const struct device *dev, struct i2c_msg *msgs,
 	return ret;
 }
 
+
+
+
 static void mcux_lpi2c_isr(const struct device *dev)
 {
 	const struct mcux_lpi2c_config *config = dev->config;
@@ -238,9 +243,22 @@ static int mcux_lpi2c_init(const struct device *dev)
 	return 0;
 }
 
+static int mcux_lpi2c_recoveryBus(const struct device *dev)
+{
+	const struct mcux_lpi2c_config *config = dev->config;
+	LPI2C_Type *base = config->base;
+
+	LPI2C_MasterDeinit(base);
+	mcux_lpi2c_init(dev);
+
+	return 0;
+
+}
+
 static const struct i2c_driver_api mcux_lpi2c_driver_api = {
 	.configure = mcux_lpi2c_configure,
 	.transfer = mcux_lpi2c_transfer,
+	.recover_bus = mcux_lpi2c_recoveryBus,
 };
 
 #define I2C_MCUX_LPI2C_INIT(n)						\
